@@ -27,18 +27,8 @@ const Login: React.FC = () => {
         throw new Error('No session established');
       }
 
-      // Check if user is an admin
-      const { data: adminUser, error: adminError } = await supabase
-        .from('admin_users')
-        .select('role')
-        .eq('user_id', session.user.id)
-        .single();
-
-      if (adminError || !adminUser || !['admin', 'super_admin'].includes(adminUser.role)) {
-        throw new Error('Unauthorized access');
-      }
-
-      navigate('/admin');
+      // Redirect to dashboard after successful login
+      navigate('/dashboard');
     } catch (error) {
       console.error('Login error:', error);
       setError(error instanceof Error ? error.message : 'Failed to login');
@@ -51,7 +41,7 @@ const Login: React.FC = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-          Admin Login
+          Sign In
         </h2>
       </div>
 
@@ -75,7 +65,7 @@ const Login: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  placeholder="admin@example.com"
+                  placeholder="you@example.com"
                 />
               </div>
             </div>
@@ -144,15 +134,24 @@ const Login: React.FC = () => {
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="px-2 bg-white dark:bg-gray-800 text-gray-500">
-                  Not an admin?
+                  Don't have an account?
                 </span>
               </div>
             </div>
 
             <div className="mt-6 text-center">
               <Link
-                to="/"
+                to="/signup"
                 className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
+              >
+                Create an account
+              </Link>
+            </div>
+
+            <div className="mt-4 text-center">
+              <Link
+                to="/"
+                className="font-medium text-gray-600 hover:text-gray-500 dark:text-gray-400 dark:hover:text-gray-300"
               >
                 Return to Home
               </Link>
