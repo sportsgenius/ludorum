@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Bot, Users, Settings, ClipboardList, Bell, Menu, X, BookOpen, Gamepad2, MonitorPlay, LineChart, MessageSquareMore, CreditCard, HelpCircle, Brain, Trophy, Megaphone, FileDown, Target, FolderRoot as Football, Wrench, Rss } from 'lucide-react';
+import { LayoutDashboard, Bot, Users, Settings, ClipboardList, Bell, Menu, X, BookOpen, Gamepad2, MonitorPlay, LineChart, MessageSquareMore, CreditCard, HelpCircle, Brain, Trophy, Megaphone, FileDown, Target, FolderRoot as Football, Wrench, Rss, Coins, UserCheck, Clock } from 'lucide-react';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -18,6 +18,9 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     
     // Revenue & AI
     { name: 'Subscriptions', icon: CreditCard, href: '/admin/subscriptions' },
+    { name: 'Tokenize', icon: Coins, href: '/admin/tokenize' },
+    { name: 'User Tokens', icon: UserCheck, href: '/admin/user-tokens' },
+    { name: 'Token Transactions', icon: Clock, href: '/admin/token-transactions' },
     { name: 'AI Model Builder', icon: Wrench, href: '/admin/model-builder' },
     { name: 'AI Models', icon: Bot, href: '/admin/models' },
     { name: 'LLM Providers', icon: Brain, href: '/admin/llm-providers' },
