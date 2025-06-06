@@ -28,7 +28,7 @@ const AdminDashboard: React.FC = () => {
         <Route path="users" element={<Users />} />
         <Route path="audit-logs" element={<AuditLogs />} />
         <Route path="settings" element={<Settings />} />
-        <Route path="*" element={<Navigate to="/admin\" replace />} />
+        <Route path="*" element={<Navigate to="/admin" replace />} />
       </Routes>
     </AdminLayout>
   );
