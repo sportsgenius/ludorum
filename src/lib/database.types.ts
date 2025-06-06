@@ -63,6 +63,7 @@ export interface Database {
           sport_id: string | null
           betting_type_id: string | null
           llm_provider_id: string | null
+          api_feed_id: string | null
           prompt_template: string | null
           created_at: string
           updated_at: string
@@ -76,6 +77,7 @@ export interface Database {
           sport_id?: string | null
           betting_type_id?: string | null
           llm_provider_id?: string | null
+          api_feed_id?: string | null
           prompt_template?: string | null
           created_at?: string
           updated_at?: string
@@ -89,6 +91,7 @@ export interface Database {
           sport_id?: string | null
           betting_type_id?: string | null
           llm_provider_id?: string | null
+          api_feed_id?: string | null
           prompt_template?: string | null
           created_at?: string
           updated_at?: string

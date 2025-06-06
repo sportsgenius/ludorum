@@ -9,6 +9,7 @@ interface AIModel {
   llm_provider_id: string;
   sport_id: string;
   betting_type_id: string;
+  api_feed_id: string | null;
   prompt_template: string;
   settings: Record<string, any>;
   is_active: boolean;
@@ -29,6 +30,11 @@ interface BetType {
   name: string;
 }
 
+interface APIFeed {
+  id: string;
+  name: string;
+}
+
 const ModelBuilder: React.FC = () => {
   const [models, setModels] = useState<AIModel[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -39,6 +45,7 @@ const ModelBuilder: React.FC = () => {
     llm_provider_id: '',
     sport_id: '',
     betting_type_id: '',
+    api_feed_id: '',
     prompt_template: '',
     settings: '{}',
     is_active: true
@@ -48,12 +55,14 @@ const ModelBuilder: React.FC = () => {
   const [llmProviders, setLLMProviders] = useState<LLMProvider[]>([]);
   const [sports, setSports] = useState<Sport[]>([]);
   const [betTypes, setBetTypes] = useState<BetType[]>([]);
+  const [apiFeeds, setAPIFeeds] = useState<APIFeed[]>([]);
 
   useEffect(() => {
     fetchModels();
     fetchLLMProviders();
     fetchSports();
     fetchBetTypes();
+    fetchAPIFeeds();
   }, []);
 
   const fetchModels = async () => {
@@ -64,7 +73,8 @@ const ModelBuilder: React.FC = () => {
           *,
           llm_providers (name),
           sports (name),
-          betting_types (name)
+          betting_types (name),
+          api_feeds (name)
         `)
         .order('name');
 
@@ -117,6 +127,21 @@ const ModelBuilder: React.FC = () => {
     }
   };
 
+  const fetchAPIFeeds = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('api_feeds')
+        .select('id, name')
+        .eq('is_active', true)
+        .order('name');
+
+      if (error) throw error;
+      setAPIFeeds(data || []);
+    } catch (error) {
+      console.error('Error fetching API feeds:', error);
+    }
+  };
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
@@ -134,6 +159,7 @@ const ModelBuilder: React.FC = () => {
       llm_provider_id: '',
       sport_id: '',
       betting_type_id: '',
+      api_feed_id: '',
       prompt_template: '',
       settings: '{}',
       is_active: true
@@ -159,6 +185,7 @@ const ModelBuilder: React.FC = () => {
         llm_provider_id: formData.llm_provider_id,
         sport_id: formData.sport_id,
         betting_type_id: formData.betting_type_id,
+        api_feed_id: formData.api_feed_id || null,
         prompt_template: formData.prompt_template,
         settings,
         is_active: formData.is_active
@@ -194,6 +221,7 @@ const ModelBuilder: React.FC = () => {
       llm_provider_id: model.llm_provider_id,
       sport_id: model.sport_id,
       betting_type_id: model.betting_type_id,
+      api_feed_id: model.api_feed_id || '',
       prompt_template: model.prompt_template,
       settings: JSON.stringify(model.settings, null, 2),
       is_active: model.is_active
@@ -312,6 +340,26 @@ const ModelBuilder: React.FC = () => {
                 </select>
               </div>
 
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  API Feed *
+                </label>
+                <select
+                  name="api_feed_id"
+                  value={formData.api_feed_id}
+                  onChange={handleInputChange}
+                  required
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm py-2.5"
+                >
+                  <option value="">No API Feed</option>
+                  {apiFeeds.map(feed => (
+                    <option key={feed.id} value={feed.id}>
+                      {feed.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               <div className="sm:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Description *
@@ -411,6 +459,9 @@ const ModelBuilder: React.FC = () => {
                 Provider
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                API Feed
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 Status
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -432,6 +483,9 @@ const ModelBuilder: React.FC = () => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                   {(model as any).llm_providers?.name || '-'}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                  {(model as any).api_feeds?.name || 'None'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm">
                   <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
