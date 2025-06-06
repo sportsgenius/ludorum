@@ -12,8 +12,6 @@ import LLMProviders from '../components/admin/LLMProviders';
 import BetTypes from '../components/admin/BetTypes';
 import Sports from '../components/admin/Sports';
 import APIFeeds from '../components/admin/APIFeeds';
-import AdminManagement from '../components/admin/AdminManagement';
-import Content from '../components/admin/Content';
 
 const AdminDashboard: React.FC = () => {
   return (
@@ -30,9 +28,7 @@ const AdminDashboard: React.FC = () => {
         <Route path="users" element={<Users />} />
         <Route path="audit-logs" element={<AuditLogs />} />
         <Route path="settings" element={<Settings />} />
-        <Route path="admins" element={<AdminManagement />} />
-        <Route path="content" element={<Content />} />
-        <Route path="*" element={<Navigate to="/admin\" replace />} />
+        <Route path="*" element={<Navigate to="/admin" replace />} />
       </Routes>
     </AdminLayout>
   );

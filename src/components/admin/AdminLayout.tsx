@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Bot, Users, Settings, ClipboardList, Bell, Menu, X, BookOpen, Gamepad2, MonitorPlay, LineChart, MessageSquareMore, CreditCard, HelpCircle, Brain, Trophy, Megaphone, FileDown, Target, FolderRoot as Football, Wrench, Rss, Shield, AlertTriangle } from 'lucide-react';
-import { useAdminRole } from '../../hooks/useAdminRole';
+import { LayoutDashboard, Bot, Users, Settings, ClipboardList, Bell, Menu, X, BookOpen, Gamepad2, MonitorPlay, LineChart, MessageSquareMore, CreditCard, HelpCircle, Brain, Trophy, Megaphone, FileDown, Target, FolderRoot as Football, Wrench, Rss } from 'lucide-react';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -11,42 +10,38 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const location = useLocation();
-  const { hasPermission, userRole, loading, error } = useAdminRole();
 
   const navigationItems = [
     // Core
-    { name: 'Dashboard', icon: LayoutDashboard, href: '/admin', permission: 'dashboard' },
-    { name: 'Users', icon: Users, href: '/admin/users', permission: 'users' },
+    { name: 'Dashboard', icon: LayoutDashboard, href: '/admin' },
+    { name: 'Users', icon: Users, href: '/admin/users' },
     
     // Revenue & AI
-    { name: 'Subscriptions', icon: CreditCard, href: '/admin/subscriptions', permission: 'subscriptions' },
-    { name: 'AI Model Builder', icon: Wrench, href: '/admin/model-builder', permission: 'models' },
-    { name: 'AI Models', icon: Bot, href: '/admin/models', permission: 'models' },
-    { name: 'LLM Providers', icon: Brain, href: '/admin/llm-providers', permission: 'llm_providers' },
+    { name: 'Subscriptions', icon: CreditCard, href: '/admin/subscriptions' },
+    { name: 'AI Model Builder', icon: Wrench, href: '/admin/model-builder' },
+    { name: 'AI Models', icon: Bot, href: '/admin/models' },
+    { name: 'LLM Providers', icon: Brain, href: '/admin/llm-providers' },
     
     // Sports & Betting
-    { name: 'Bet Types', icon: Target, href: '/admin/bet-types', permission: 'bet_types' },
-    { name: 'Sports', icon: Football, href: '/admin/sports', permission: 'sports' },
-    { name: 'API Feeds', icon: Rss, href: '/admin/api-feeds', permission: 'api_feeds' },
+    { name: 'Bet Types', icon: Target, href: '/admin/bet-types' },
+    { name: 'Sports', icon: Football, href: '/admin/sports' },
+    { name: 'API Feeds', icon: Rss, href: '/admin/api-feeds' },
     
     // Engagement
-    { name: 'Leader Board', icon: Trophy, href: '/admin/leaderboard', permission: 'leaderboard' },
-    { name: 'Campaigns', icon: Megaphone, href: '/admin/campaigns', permission: 'campaigns' },
-    { name: 'Analyzer', icon: BookOpen, href: '/admin/analyzer', permission: 'analyzer' },
-    { name: 'Content', icon: MessageSquareMore, href: '/admin/content', permission: 'content' },
-    { name: 'Gamification', icon: Gamepad2, href: '/admin/gamification', permission: 'gamification' },
-    { name: 'Ads', icon: MonitorPlay, href: '/admin/ads', permission: 'ads' },
+    { name: 'Leader Board', icon: Trophy, href: '/admin/leaderboard' },
+    { name: 'Campaigns', icon: Megaphone, href: '/admin/campaigns' },
+    { name: 'Analyzer', icon: BookOpen, href: '/admin/analyzer' },
+    { name: 'Content', icon: MessageSquareMore, href: '/admin/content' },
+    { name: 'Gamification', icon: Gamepad2, href: '/admin/gamification' },
+    { name: 'Ads', icon: MonitorPlay, href: '/admin/ads' },
     
     // System
-    { name: 'Export Center', icon: FileDown, href: '/admin/export', permission: 'export' },
-    { name: 'Audit Logs', icon: ClipboardList, href: '/admin/audit-logs', permission: 'audit_logs' },
-    { name: 'Notifications', icon: Bell, href: '/admin/notifications', permission: 'notifications' },
-    { name: 'Analytics', icon: LineChart, href: '/admin/analytics', permission: 'analytics' },
-    { name: 'Support', icon: HelpCircle, href: '/admin/support', permission: 'support' },
-    { name: 'Settings', icon: Settings, href: '/admin/settings', permission: 'settings' },
-    
-    // Admin Management
-    { name: 'Admin Management', icon: Shield, href: '/admin/admins', permission: 'admin_management' },
+    { name: 'Export Center', icon: FileDown, href: '/admin/export' },
+    { name: 'Audit Logs', icon: ClipboardList, href: '/admin/audit-logs' },
+    { name: 'Notifications', icon: Bell, href: '/admin/notifications' },
+    { name: 'Analytics', icon: LineChart, href: '/admin/analytics' },
+    { name: 'Support', icon: HelpCircle, href: '/admin/support' },
+    { name: 'Settings', icon: Settings, href: '/admin/settings' },
   ];
 
   const notifications = [
@@ -63,58 +58,6 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       time: '1h ago',
     },
   ];
-
-  // Filter navigation items based on permissions
-  const visibleNavigationItems = navigationItems.filter(item => 
-    hasPermission(item.permission)
-  );
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading admin access...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
-        <div className="text-center max-w-md">
-          <AlertTriangle className="h-12 w-12 text-red-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Access Error</h3>
-          <p className="text-gray-500 dark:text-gray-400 mb-4">{error}</p>
-          <Link 
-            to="/login" 
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
-          >
-            Try Login Again
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  if (!userRole) {
-    return (
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <Shield className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Access Denied</h3>
-          <p className="text-gray-500 dark:text-gray-400 mb-4">You don't have admin access to this system.</p>
-          <Link 
-            to="/login" 
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
-          >
-            Admin Login
-          </Link>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex">
@@ -141,7 +84,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           </div>
 
           <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
-            {visibleNavigationItems.map((item) => (
+            {navigationItems.map((item) => (
               <Link
                 key={item.name}
                 to={item.href}
@@ -157,25 +100,6 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               </Link>
             ))}
           </nav>
-
-          {/* User Role Display */}
-          <div className="px-4 py-4 border-t border-gray-200 dark:border-gray-700">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="h-8 w-8 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center">
-                  <Shield className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
-                </div>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {userRole.role_details?.display_name || userRole.role_name}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Admin Access
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
