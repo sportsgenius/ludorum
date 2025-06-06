@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Bot, Users, Settings, ClipboardList, Bell, Menu, X, BookOpen, Gamepad2, MonitorPlay, LineChart, MessageSquareMore, CreditCard, HelpCircle, Brain, Trophy, Megaphone, FileDown, Target, FolderRoot as Football, Wrench, Rss, Shield } from 'lucide-react';
+import { LayoutDashboard, Bot, Users, Settings, ClipboardList, Bell, Menu, X, BookOpen, Gamepad2, MonitorPlay, LineChart, MessageSquareMore, CreditCard, HelpCircle, Brain, Trophy, Megaphone, FileDown, Target, FolderRoot as Football, Wrench, Rss, Shield, AlertTriangle } from 'lucide-react';
 import { useAdminRole } from '../../hooks/useAdminRole';
 
 interface AdminLayoutProps {
@@ -11,7 +11,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const location = useLocation();
-  const { hasPermission, userRole, loading } = useAdminRole();
+  const { hasPermission, userRole, loading, error } = useAdminRole();
 
   const navigationItems = [
     // Core
@@ -74,7 +74,25 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading admin access...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <AlertTriangle className="h-12 w-12 text-red-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Access Error</h3>
+          <p className="text-gray-500 dark:text-gray-400 mb-4">{error}</p>
+          <Link 
+            to="/login" 
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+          >
+            Try Login Again
+          </Link>
         </div>
       </div>
     );
@@ -86,7 +104,13 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         <div className="text-center">
           <Shield className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Access Denied</h3>
-          <p className="text-gray-500 dark:text-gray-400">You don't have admin access to this system.</p>
+          <p className="text-gray-500 dark:text-gray-400 mb-4">You don't have admin access to this system.</p>
+          <Link 
+            to="/login" 
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+          >
+            Admin Login
+          </Link>
         </div>
       </div>
     );

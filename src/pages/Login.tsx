@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, Loader2 } from 'lucide-react';
+import { Mail, Lock, Loader2, AlertTriangle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 const Login: React.FC = () => {
@@ -8,37 +8,93 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [debugInfo, setDebugInfo] = useState<any>(null);
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
+    setDebugInfo(null);
 
     try {
+      console.log('Attempting login for:', email);
+
+      // Step 1: Sign in with Supabase Auth
       const { data: { session }, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password
       });
 
-      if (signInError) throw signInError;
+      if (signInError) {
+        console.error('Sign in error:', signInError);
+        throw signInError;
+      }
 
       if (!session) {
-        throw new Error('No session established');
+        throw new Error('No session established after login');
       }
 
-      // Check if user is an admin
-      const { data: adminUser, error: adminError } = await supabase
-        .from('admin_users')
-        .select('role')
+      console.log('Login successful, session established:', session.user.id);
+
+      // Step 2: Check admin role assignments
+      const { data: roleAssignments, error: roleError } = await supabase
+        .from('admin_role_assignments')
+        .select(`
+          *,
+          admin_roles (
+            role_name,
+            display_name,
+            permissions
+          )
+        `)
         .eq('user_id', session.user.id)
-        .single();
+        .eq('is_active', true);
 
-      if (adminError || !adminUser || !['admin', 'super_admin'].includes(adminUser.role)) {
-        throw new Error('Unauthorized access');
+      console.log('Role assignments query result:', { roleAssignments, roleError });
+
+      if (roleError) {
+        console.error('Role check error:', roleError);
+        setDebugInfo({
+          userId: session.user.id,
+          email: session.user.email,
+          roleError: roleError.message,
+          roleAssignments: null
+        });
+        throw new Error(`Role check failed: ${roleError.message}`);
       }
 
+      if (!roleAssignments || roleAssignments.length === 0) {
+        console.log('No admin roles found for user');
+        setDebugInfo({
+          userId: session.user.id,
+          email: session.user.email,
+          roleAssignments: roleAssignments,
+          message: 'No admin role assignments found'
+        });
+        throw new Error('No admin access found for this account');
+      }
+
+      // Step 3: Check if user has valid admin permissions
+      const activeRole = roleAssignments[0];
+      console.log('Active role found:', activeRole);
+
+      if (!activeRole.admin_roles) {
+        throw new Error('Role configuration not found');
+      }
+
+      setDebugInfo({
+        userId: session.user.id,
+        email: session.user.email,
+        roleAssignments: roleAssignments,
+        activeRole: activeRole,
+        permissions: activeRole.admin_roles.permissions
+      });
+
+      // Success - redirect to admin dashboard
+      console.log('Access granted, redirecting to admin dashboard');
       navigate('/admin');
+
     } catch (error) {
       console.error('Login error:', error);
       setError(error instanceof Error ? error.message : 'Failed to login');
@@ -106,14 +162,30 @@ const Login: React.FC = () => {
               <div className="rounded-md bg-red-50 dark:bg-red-900/30 p-4">
                 <div className="flex">
                   <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                    </svg>
+                    <AlertTriangle className="h-5 w-5 text-red-400" />
                   </div>
                   <div className="ml-3">
                     <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
                       {error}
                     </h3>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {debugInfo && (
+              <div className="rounded-md bg-blue-50 dark:bg-blue-900/30 p-4">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <AlertTriangle className="h-5 w-5 text-blue-400" />
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">
+                      Debug Information
+                    </h3>
+                    <pre className="text-xs text-blue-700 dark:text-blue-300 overflow-auto">
+                      {JSON.stringify(debugInfo, null, 2)}
+                    </pre>
                   </div>
                 </div>
               </div>

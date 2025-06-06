@@ -24,17 +24,37 @@ export function useAdminRole() {
 
   useEffect(() => {
     fetchUserRole();
+
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        fetchUserRole();
+      } else if (event === 'SIGNED_OUT') {
+        setUserRole(null);
+        setPermissions({});
+        setLoading(false);
+        setError(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const fetchUserRole = async () => {
     try {
       setLoading(true);
+      setError(null);
+
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        setError('No authenticated user');
+        console.log('No authenticated user found');
+        setUserRole(null);
+        setPermissions({});
         return;
       }
+
+      console.log('Fetching role for user:', user.id);
 
       // Get user's role assignment with role details
       const { data: roleData, error: roleError } = await supabase
@@ -50,36 +70,57 @@ export function useAdminRole() {
         .eq('user_id', user.id)
         .eq('is_active', true)
         .order('assigned_at', { ascending: false })
-        .limit(1)
-        .single();
+        .limit(1);
+
+      console.log('Role query result:', { roleData, roleError });
 
       if (roleError) {
-        if (roleError.code === 'PGRST116') {
-          setError('No admin role assigned');
-        } else {
-          throw roleError;
-        }
+        console.error('Role fetch error:', roleError);
+        setError(`Role fetch failed: ${roleError.message}`);
+        return;
+      }
+
+      if (!roleData || roleData.length === 0) {
+        console.log('No active admin role found for user');
+        setError('No admin role assigned');
+        setUserRole(null);
+        setPermissions({});
+        return;
+      }
+
+      const activeRole = roleData[0];
+      console.log('Active role found:', activeRole);
+
+      if (!activeRole.admin_roles) {
+        console.error('Role details not found');
+        setError('Role configuration missing');
         return;
       }
 
       const userRoleWithDetails: UserRole = {
-        ...roleData,
-        role_details: roleData.admin_roles
+        ...activeRole,
+        role_details: activeRole.admin_roles
       };
 
+      console.log('Setting user role:', userRoleWithDetails);
       setUserRole(userRoleWithDetails);
-      setPermissions(roleData.admin_roles?.permissions || {});
+      setPermissions(activeRole.admin_roles.permissions || {});
       setError(null);
+
     } catch (err) {
       console.error('Error fetching user role:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch user role');
+      setUserRole(null);
+      setPermissions({});
     } finally {
       setLoading(false);
     }
   };
 
   const hasPermission = (permission: string): boolean => {
-    return permissions[permission] === true;
+    const result = permissions[permission] === true;
+    console.log(`Permission check for '${permission}':`, result);
+    return result;
   };
 
   const isRole = (role: 'super_admin' | 'admin' | 'content_creator'): boolean => {
