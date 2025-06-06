@@ -12,6 +12,9 @@ import LLMProviders from '../components/admin/LLMProviders';
 import BetTypes from '../components/admin/BetTypes';
 import Sports from '../components/admin/Sports';
 import APIFeeds from '../components/admin/APIFeeds';
+import Tokenize from '../components/admin/Tokenize';
+import UserTokens from '../components/admin/UserTokens';
+import TokenTransactions from '../components/admin/TokenTransactions';
 
 const AdminDashboard: React.FC = () => {
   return (
@@ -25,10 +28,13 @@ const AdminDashboard: React.FC = () => {
         <Route path="bet-types" element={<BetTypes />} />
         <Route path="sports" element={<Sports />} />
         <Route path="api-feeds" element={<APIFeeds />} />
+        <Route path="tokenize" element={<Tokenize />} />
+        <Route path="user-tokens" element={<UserTokens />} />
+        <Route path="token-transactions" element={<TokenTransactions />} />
         <Route path="users" element={<Users />} />
         <Route path="audit-logs" element={<AuditLogs />} />
         <Route path="settings" element={<Settings />} />
-        <Route path="*" element={<Navigate to="/admin" replace />} />
+        <Route path="*" element={<Navigate to="/admin\" replace />} />
       </Routes>
     </AdminLayout>
   );
