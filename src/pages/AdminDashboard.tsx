@@ -32,7 +32,7 @@ const AdminDashboard: React.FC = () => {
         <Route path="settings" element={<Settings />} />
         <Route path="admins" element={<AdminManagement />} />
         <Route path="content" element={<Content />} />
-        <Route path="*" element={<Navigate to="/admin" replace />} />
+        <Route path="*" element={<Navigate to="/admin\" replace />} />
       </Routes>
     </AdminLayout>
   );
