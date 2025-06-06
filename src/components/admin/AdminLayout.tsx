@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Bot, Users, Settings, ClipboardList, Bell, Menu, X, BookOpen, Gamepad2, MonitorPlay, LineChart, MessageSquareMore, CreditCard, HelpCircle, Brain, Trophy, Megaphone, FileDown, Target, FolderRoot as Football, Wrench, Rss, Coins, UserCheck, Clock } from 'lucide-react';
+import { LayoutDashboard, Bot, Users, Settings, ClipboardList, Bell, Menu, X, BookOpen, Gamepad2, MonitorPlay, LineChart, MessageSquareMore, CreditCard, HelpCircle, Brain, Trophy, Megaphone, FileDown, Target, FolderRoot as Football, Wrench, Rss, Coins, UserCheck, Clock, Sun, Moon } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -9,6 +10,7 @@ interface AdminLayoutProps {
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
   const location = useLocation();
 
   const navigationItems = [
@@ -121,38 +123,50 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                 </button>
               </div>
 
-              {/* Notifications */}
-              <div className="relative">
+              {/* Right side controls */}
+              <div className="flex items-center space-x-4">
+                {/* Theme Toggle */}
                 <button
-                  onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                  className="p-1 text-gray-500 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300"
+                  onClick={toggleTheme}
+                  className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                  aria-label="Toggle theme"
                 >
-                  <Bell className="h-6 w-6" />
-                  <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400 ring-2 ring-white dark:ring-gray-800" />
+                  {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
                 </button>
 
-                {isNotificationsOpen && (
-                  <div className="absolute right-0 mt-2 w-80 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5">
-                    <div className="py-1" role="menu">
-                      {notifications.map((notification) => (
-                        <div
-                          key={notification.id}
-                          className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
-                        >
-                          <p className="text-sm font-medium text-gray-900 dark:text-white">
-                            {notification.title}
-                          </p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            {notification.message}
-                          </p>
-                          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                            {notification.time}
-                          </p>
-                        </div>
-                      ))}
+                {/* Notifications */}
+                <div className="relative">
+                  <button
+                    onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                    className="p-1 text-gray-500 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300"
+                  >
+                    <Bell className="h-6 w-6" />
+                    <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400 ring-2 ring-white dark:ring-gray-800" />
+                  </button>
+
+                  {isNotificationsOpen && (
+                    <div className="absolute right-0 mt-2 w-80 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5">
+                      <div className="py-1" role="menu">
+                        {notifications.map((notification) => (
+                          <div
+                            key={notification.id}
+                            className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          >
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">
+                              {notification.title}
+                            </p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                              {notification.message}
+                            </p>
+                            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                              {notification.time}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
           </div>
